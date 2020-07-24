@@ -2,7 +2,9 @@ package se.lexicon.romeobot.Data;
 
 public class TextManaging {
 
-    char[] copyright = new char[] {'©',' ','Ο','Ǝ','Ϻ','Ο','Я',};
+    char[] copyright = new char[]{'©', ' ', 'Ο', 'Ǝ', 'Ϻ', 'Ο', 'Я',};
+//    String[] weekDay = new String[]{"Monday","Tuesday","Wednesday","Thursday","Friday"};
+
 
     public String[] resultInput(String input) {
         input = input.trim().toUpperCase().replaceAll("\\s", "");
@@ -19,18 +21,22 @@ public class TextManaging {
 
         switch (inputArray[0]) {
             case '$':
+            case 'D':
                 output = '$';
                 break;
 
             case '£':
+            case 'P':
                 output = '£';
                 break;
 
             case '€':
+            case 'E':
                 output = '€';
                 break;
 
             case '¥':
+            case 'Y':
                 output = '¥';
                 break;
 
@@ -42,16 +48,16 @@ public class TextManaging {
         //System.out.println(outputValues.toString());
         outputValues[1] = input.replaceAll("[^0-9]", "");
         return outputValues;
-    }
+    }  // End resultInput
 
     public String print2decimals(double amount) {
-        int twoDecimals = (int)(amount * 100.0) % 100;
-        // int noDecimals = Math.floor(amount);
-        String print2decimals = String.valueOf((int)amount);
+        int twoDecimals = (int) (amount * 100.0) % 100;
+        String print2decimals = String.valueOf((int) amount);
+
         if (twoDecimals < 10) {
             print2decimals = print2decimals + ".0" + twoDecimals;
         } else {
-            print2decimals = print2decimals +"." + twoDecimals;
+            print2decimals = print2decimals + "." + twoDecimals;
         }
         return print2decimals;
     }

@@ -4,22 +4,33 @@ import java.util.Arrays;
 
 public class CurrencyAndBalance {
 
-    String[] wallet = new String[] {"$50","$20","$20","$10","$5","£50","£20","£10","£5",
-            "€50","€20","€10","€10","€5","¥5000","¥5000","¥2000"};
+    TextManaging readText = new TextManaging();
 
-    private final static double USD = 9.2 + (Math.random() * 2.8);
-    private final static double GBP = 11.6 + (Math.random() * 2.1);
-    private final static double EUR = 9.8 + (Math.random() * 1.8);
-    private final static double JPY = 0.08 + (Math.random() * 0.03);
-    private final static double SEK = 1;
+    String[] wallet = new String[]{"£20","$50","€10","¤100"};
+
+//            {"$50", "$20", "$20", "$10", "$5", "£50", "£20", "£10", "£5",
+//            "€50", "€20", "€10", "€10", "€5", "¥5000", "¥5000", "¥2000", "¤500", "¤200", "¤200", "¤50", "¤20"};
+
+    private double USD = 9.1;
+    private double GBP = 11.5;
+    private double EUR = 9.7;
+    private double JPY = 0.08;
+    private double SEK = 1;
 
     int[] usdBills = new int[]{1, 2, 5, 10, 20, 50, 100};
     int[] gbpBills = new int[]{5, 10, 20, 50};
-    int[] eurBills = new int[]{5, 10, 20, 50, 100, 200};
+    int[] eurBills = new int[]{5, 10, 20, 50, 100, 200, 500};
     int[] jpyBills = new int[]{1000, 2000, 5000, 10000};
-    int[] sekBills = new int[]{20, 50, 100, 200, 500};
+    int[] sekBills = new int[]{20, 50, 100, 200, 500, 1000};
 
     private double balance;
+
+    public void setNewCurrencyRate() {
+        USD = 9.1 + (Math.random() * 2.8);
+        GBP = 11.5 + (Math.random() * 2.4);
+        EUR = 9.7 + (Math.random() * 1.8);
+        JPY = 0.08 + (Math.random() * 0.03);
+    }
 
     public double exchange(char symbol, double amount) { // input foreign currency, output sek
 
@@ -120,50 +131,98 @@ public class CurrencyAndBalance {
     }
 
     public double returnAllChange() {
-        int nrOfBills;
+        //int nrOfBills;
 
-        if (getBalance() < 20) {
+        if (getBalance() < sekBills[0]) {
             System.out.println("No change:");
-        }
-        for (int i = sekBills.length - 1; i >= 0; i--) {
-            nrOfBills = (int)getBalance() / sekBills[i];
-            setBalance(-nrOfBills * sekBills[i]); // kolla om den avrundar?
+        } else {
+            for (int i = sekBills.length - 1; i >= 0; i--) { // Skriv om denna helt
+                // nrOfBills = (int) getBalance() / sekBills[i];
 
-            // System.out.println("Change left: kr " + getBalance());
+                while (getBalance() >= sekBills[i]) {
 
-            if (nrOfBills > 0) {
-                System.out.println("Change returned: " + nrOfBills + " x kr." + sekBills[i]);
-                //   System.out.println("Change left: kr " + (getBalance()) );
+                    if (getBalance() < sekBills[i] + 20 && getBalance() >= sekBills[i] + 10 && i > 0) {
+                        System.out.println("Helping with right change ---");// Test
+                        break;
+                    }
+                    if (getBalance() < sekBills[i] + 40 && getBalance() >= sekBills[i] + 30 && i > 0) {
+                        System.out.println("Helping with right change ---");// Test
+                        break;
+                    }
+                    setBalance(-sekBills[i]);
+                    addToWallet('¤', sekBills[i]);
+                    System.out.println("You got a " + sekBills[i] + " kr bill in your wallet.");
+                }
+                System.out.println("Change left: kr " + readText.print2decimals(getBalance())); // Just for test
             }
         }
         return getBalance();
     }
-    /**
-    public double truncateAmount(double amount) {
-        return (Math.floor(amount * 100) / 100d);
-    }
-     */
 
-    public String getTodaysCurrency() {
-        String s = "USD = " + (int)(USD * 10000) / 10000d + " - GBP = " + (int)(GBP * 10000) / 10000d +
-                " - EUR = " + (int)(EUR * 10000) / 10000d + " - JPY = " + (int)(JPY * 10000) / 10000d;
+    public String getCurrencyRate () { // Prints the exchange rate for all currency
+        String s = "USD = " + (int) (USD * 10000) / 10000d + " - GBP = " + (int) (GBP * 10000) / 10000d +
+                " - EUR = " + (int) (EUR * 10000) / 10000d + " - JPY = " + (int) (JPY * 10000) / 10000d;
         return s;
     }
 
-    public String printWallet(){
+    public String printWallet() {
         return Arrays.toString(wallet);
+    }
+    public double getWalletValue() { // sum of all bills in wallet in sek
+        double total = 0;
+        double amount;
+        char symbol;
+        for (int i = 0; i < wallet.length; i++) {
+            symbol = wallet[i].charAt(0);
+            amount = Double.parseDouble(wallet[i].replace(String.valueOf(symbol),""));
+            total += exchange(symbol, amount);
+            // System.out.println(total);
+        }
+        return total;
+    }
+    public double getWalletValue(char symbol) { // sum of all bills from a currency in wallet, in SEK
+        double total = 0;
+        double amount;
+//        char symbol;
+        for (int i = 0; i < wallet.length; i++) {
+
+            if (symbol == wallet[i].charAt(0)) {
+                amount = Double.parseDouble(wallet[i].replace(String.valueOf(symbol), ""));
+                total += exchange(symbol, amount);
+                System.out.println(total);
+            }
+        }
+        return total;
+    }
+
+    public void addToWallet(char symbol, int amount) {
+        int size = wallet.length;
+        String bill = symbol + String.valueOf(amount);
+        wallet = Arrays.copyOf(wallet, size + 1);
+        wallet[size] = bill;
     }
 
     public boolean removeFromWallet(char symbol, int amount) {
-        for (int i = 0; i < wallet.length; i++) {
-            String bill = symbol + String.valueOf(amount);
+        int size = wallet.length;
+        String bill = symbol + String.valueOf(amount);
+        for (int i = 0; i < size; i++) {
 
-            if (wallet[i].equals(bill)) {
-                return true;
-                // Remove bill from wallet and change array.wallet
+            if (wallet[i].equals(bill)) { // Är det något fel här?
+                for (int j = i; j < size - 1; j++) {
+                    wallet[j] = wallet[j + 1];
+                }
+                wallet = Arrays.copyOf(wallet, size - 1);
+                return true;       // Remove bill from wallet and change array.wallet
             }
         }
         return false;
+    }
+
+    public void printAvailableBills() {
+        System.out.println("USD: " + Arrays.toString(usdBills));
+        System.out.println("GBP: " + Arrays.toString(gbpBills));
+        System.out.println("EUR: " + Arrays.toString(eurBills));
+        System.out.println("JPY: " + Arrays.toString(jpyBills));
     }
 
     public double getBalance() {
